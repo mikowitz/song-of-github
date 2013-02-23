@@ -1,0 +1,76 @@
+!!! 5
+html(lang="en")
+  head
+    title Song of GitHub - Let me sing you the song of my contributions
+    link(href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700', rel='stylesheet', type='text/css')
+    link(href='/css/style.css', rel='stylesheet', type='text/css')
+    
+  body
+    section#main
+      if !locals.embeddable
+        h1 Song of GitHub
+        h2 Let me sing you the song of my contributions
+
+        p (Sound on, please)
+
+        form(action='/', method='GET')
+          label(for='username') (comma-separated) GitHub username(s):
+          input(name='username', value=locals.namesString, size=50)
+          button(type='submit') Play that sassy jazz
+
+      if locals.invalidNames
+        p These usernames are invalid and were not included #{invalidNames}
+
+      if locals.calendarData
+        - calendarData.forEach(function(item) {
+          div(id='#{item.key}')
+            h3 #{item.key} in C Major.
+            
+            table#visualize
+              each n in [0,1,2,3,4,5,6]
+                tr(id='day#{n}')
+            
+            p: a(href='/?username=#{item.key}') Share this (solo).
+        - })
+
+      if !locals.embeddable
+        if locals.anyValidNames
+          p: h3: a(href='/?username=#{namesString}') Share this (all parts).
+
+
+        footer
+          :markdown
+            [Get the code on GitHub.](https://github.com/ajacksified/song-of-github)
+            By [@ajacksified](http://twitter.com/ajacksified) and
+            [some amazing contributors](https://github.com/ajacksified/song-of-github/contributors).
+            Uses the super cool [Midi.js](http://mudcu.be/midi-js/).
+
+      if locals.embeddable
+        p: a(href='http://song-of-github.herokuapp.com') Listen to your song.
+
+  
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', type='text/javascript')
+    script(src='/js/MIDI.min.js', type='text/javascript')
+    script(src='/js/base64binary.js', type='text/javascript')
+    
+    | <script type='text/javascript'>
+    |   var names = [];
+    if locals.calendarData
+      - calendarData.forEach(function(item) {
+        | !{item.key} = !{item.value};
+        | names.push('!{item.key}');
+      - })
+    | </script>
+
+    script(src='/js/index.js', type='text/javascript') 
+    
+    script(type='text/javascript')
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-37501388-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
