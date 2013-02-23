@@ -1,34 +1,25 @@
 ((global, $, MIDI) ->
   'use strict'
 
-  mapping = {
-    'fill: #eeeeee;' : 0
-    'fill: #d6e685;' : 1
-    'fill: #8cc665;' : 2
-    'fill: #44a340;' : 3
-    'fill: #1e6823;' : 4
-  }
   names = global.names
-  
+
   organizeData = (calendarData) ->
     weeks = []
     column = []
     d = new Date calendarData[0][0]
     dayOffset = d.getDay()
-    for i in [0...dayOffset] by 1
-      calendarData = [[0,0]].concat calendarData
-    
-    for i in [0...calendarData.length] by 1
 
-      contrib = calendarData[i][1]
-      column.push contrib
+    calendarData = ([0, 0] for i in [0...dayOffset]).concat calendarData
+
+    for cd, i in calendarData
+      column.push calendarData[i][1]
 
       if i > 0 && ((i + 1) % 7 == 0)
         weeks.push column
         column = []
     
     weeks
-    
+
   updateTD = (week, day, name) ->
     $("##{name} #visualize").find("tr:eq(#{day}) > td:eq(#{week})").css({opacity: 0.25})
 
@@ -36,7 +27,7 @@
     days = ($("##{name} #day#{i}") for i in [0..6])
     
     for week, n in weeks
-      for m in [0...week.length]
+      for w, m in week
         contrib = switch weeks[n][m]
           when 0 then 0
           when 1,2,3,4 then 1
@@ -54,10 +45,10 @@
         MIDI.programChange 0, 0
         MIDI.programChange 1, 118
 
-        for n in [0...weeks[0].length] by 1
+        for w, n in weeks[0]
           delay = n
-          for i of weeks
-            playWeek weeks[i][n], n, names[i]
+          for week, i in weeks
+            playWeek week[n], n, names[i]
     }
 
   chords = {
@@ -69,30 +60,26 @@
     vi:   [45, 48, 52, 57, 60, 64, 69],
     vii:  [47, 50, 53, 59, 62, 65, 71]
   }
-  
+
   chordMap = (k for k, v of chords)
-  
+
   playWeek = (week, n, name) ->
     note = 60
     noteDelay = 0
     sum = week.reduce(((t, n) -> t + n), 0)
-    
+
     getChord = ->
       l = chordMap.length
       chords[chordMap[(sum ^ l) % (l - 1)]]
-      
+
     getNote = ->
       note = chord[m]
       if (sum % 14 == 0) && (m % 3 == 0) then note + 1 else note
-      
+
     getVelocity = -> 20 + (m * 4)
-      
+
     getDelay = ->
-      if arpeggio
-        noteDelay = delay + (m / chordMap.length - 1)
-      else
-        noteDelay = delay
-        
+      noteDelay = if arpeggio then delay + (m / chordMap.length - 1) else delay
       noteDelay
       
     chord = getChord()
@@ -109,7 +96,7 @@
           updateTD n, m, name
         ), noteDelay * 1000)
       )(n, m, name)
-    
+
   $ ->
     allWeeks = []
     for name in names

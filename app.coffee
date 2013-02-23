@@ -19,10 +19,10 @@ app.configure () ->
   app.use app.router
   app.use require('less-middleware')({ src: __dirname + '/public' })
   app.use express.static(path.join(__dirname, 'public'))
-  
+
 app.configure 'development', () ->
   app.use express.errorHandler()
-  
+
 getGitHubData = (name) ->
   (callback) ->
     url = "https://github.com/users/#{name}/contributions_calendar_data"
@@ -33,7 +33,7 @@ getGitHubData = (name) ->
           callback null, d
       else
         callback null, 'invalid'
- 
+
 app.get '/', (req, res) ->
   if req.query.username
     names = req.query.username.replace(/\s/g, '').split(',')
@@ -54,7 +54,7 @@ app.get '/', (req, res) ->
           validNames.push names[i]
         else
           invalidNames.push names[i]
-          
+
       res.render 'index', {
         calendarData: returning,
         names: validNames, anyValidNames: validNames.length > 0,
