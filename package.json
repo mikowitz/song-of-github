@@ -9,6 +9,7 @@
     "express": "3.1.0",
     "hjs": "0.0.4",
     "less-middleware": "0.1.9",
+    "coffee-script": "1.4.0",
     "async": "0.2.5"
   },
   "engines": {
